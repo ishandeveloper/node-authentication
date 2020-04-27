@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const encrypt = require('mongoose-encryption');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8080;
+const secret=process.env.SECRET;
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
@@ -31,6 +33,7 @@ mongoose.connect("mongodb://localhost:27017/authentication", {
 });
 
 
+
 ///////////////////////USERS/////////////////////
 
 const userSchema = mongoose.Schema({
@@ -38,6 +41,16 @@ const userSchema = mongoose.Schema({
     password: String
 });
 
+//////////////////////SECRET////////////////////
+
+
+userSchema.plugin(encrypt, {
+    secret: secret,
+    encryptedFields:["password"]
+});
+
+
+///////////////////////MODEL/////////////////////
 const User = mongoose.model('user', userSchema);
 
 app.post('/signup', (req, res) => {
