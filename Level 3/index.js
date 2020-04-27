@@ -1,13 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const encrypt = require('mongoose-encryption');
+
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8080;
-const secret=process.env.SECRET;
-
+const secret = process.env.SECRET;
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
     extended: true
@@ -44,10 +43,7 @@ const userSchema = mongoose.Schema({
 //////////////////////SECRET////////////////////
 
 
-userSchema.plugin(encrypt, {
-    secret: secret,
-    encryptedFields:["password"]
-});
+
 
 
 ///////////////////////MODEL/////////////////////
