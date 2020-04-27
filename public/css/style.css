@@ -5,6 +5,23 @@ body {
     font-family: 'Poppins', sans-serif !important;
 }
 
+.centered {
+    padding-top: 30vh;
+    /* display:; */
+    top:0;
+    bottom: 0;
+    text-align: center;
+}
+
+.secret-text {
+    text-align: center;
+    font-size: 2rem;
+    color: #fff;
+    background-color: #000;
+}
+.jumbotron{
+    background-color: white!important;
+}
 #left-section {
     background: #4e73df;
     height: auto;
