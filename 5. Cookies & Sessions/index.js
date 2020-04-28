@@ -1,32 +1,31 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const session=require('express-session');
-const passport=require('passport');
-const passportLocalMongoose=require('passport-local-mongoose');
+const session = require('express-session');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8080;
+app.use('/public', express.static('public'));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
 ////////////////////////////////ENABLING SESSION/////////////////////////
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         secure: true
     }
 }))
 
-app.use('/public', express.static('public'));
+app.use(passport.initialize());
+app.use(passport.session());
 ////////////////////////////////////ROUTES///////////////////////////////
 app.get('/', (req, res) => {
     res.render('home.ejs');
@@ -54,6 +53,7 @@ const userSchema = mongoose.Schema({
     password: String
 });
 
+userSchema.plugin(passportLocalMongoose);
 //////////////////////SECRET////////////////////
 
 
@@ -62,21 +62,13 @@ const userSchema = mongoose.Schema({
 ///////////////////////MODEL/////////////////////
 const User = mongoose.model('user', userSchema);
 
-app.post('/signup', (req, res) => {
-    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-        const newUser = User({
-            username: req.body.username,
-            password: hash
-        });
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-        newUser.save((e) => {
-            if (!e) {
-                res.render('secrets.ejs');
-            } else {
-                console.log(e);
-            }
-        });
-    });
+app.post('/signup', (req, res) => {
+
+
 
 });
 
@@ -87,27 +79,7 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    const user = req.body.username;
-    const pass = req.body.password;
 
-    User.findOne({
-        username: user
-    }, (e, matchedUser) => {
-        if (!e) {
-            bcrypt.compare(pass,matchedUser.password,(e,result)=>{
-                if(!e){
-                    if(result){
-                        res.render('secrets.ejs');
-                    }
-                    else{
-                        res.redirect('/login');
-                    }
-                }
-            });
-        } else {
-            console.log(e);
-        }
-    });
 
 });
 
