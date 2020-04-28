@@ -3,6 +3,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const session=require('express-session');
+const passport=require('passport');
+const passportLocalMongoose=require('passport-local-mongoose');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -10,6 +14,17 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+////////////////////////////////ENABLING SESSION/////////////////////////
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: true
+    }
+}))
 
 app.use('/public', express.static('public'));
 ////////////////////////////////////ROUTES///////////////////////////////
