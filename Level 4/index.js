@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const md5 = require('md5');
+const bcrypt = require('bcrypt');
+const saltRounds=10;
 require('dotenv').config();
 
 const app = express();
