@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+
 require('dotenv').config();
 
 const app = express();
@@ -59,9 +61,29 @@ userSchema.plugin(passportLocalMongoose);
 ///////////////////////MODEL/////////////////////
 const User = mongoose.model('user', userSchema);
 
+
+
+//////////////////////OAUTH2.0/////////////////////
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+passport.use(new GoogleStrategy({
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        callbackURL: "http://www.example.com/auth/google/callback"
+    },
+    function (accessToken, refreshToken, profile, cb) {
+        User.findOrCreate({
+            googleId: profile.id
+        }, function (err, user) {
+            return cb(err, user);
+        });
+    }
+));
+
+
 
 app.get('/secrets', (req, res) => {
     if (req.isAuthenticated()) {
@@ -97,18 +119,17 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
 
-    const newUser=User({
-        username:req.body.username,
-        password:req.body.password
+    const newUser = User({
+        username: req.body.username,
+        password: req.body.password
     });
 
-    req.login(newUser,(e)=>{
-        if(e){
+    req.login(newUser, (e) => {
+        if (e) {
             console.log(e);
             res.redirect('/login');
-        }
-        else{
-            passport.authenticate("local")(req,res,()=>{
+        } else {
+            passport.authenticate("local")(req, res, () => {
                 res.redirect('/secrets');
             });
         }
@@ -118,7 +139,7 @@ app.post('/login', (req, res) => {
 
 ///////////////////////////////LOGOUT USERS////////////////////////////////////////
 
-app.get('/logout',(req,res)=>{
+app.get('/logout', (req, res) => {
     req.logOut();
     res.redirect('/');
 });
