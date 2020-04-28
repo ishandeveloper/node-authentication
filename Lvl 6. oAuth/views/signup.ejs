@@ -1,0 +1,35 @@
+  <%- include('partials/header'); -%>
+  <title>Login | ishandeveloper</title>
+  </head>
+
+  <body style="overflow: hidden;">
+      <div class="row" style="height:100vh;">
+          <div id="right-section" class="col">
+
+              <div id="login-area">
+                  <h2>
+                      Let's <small class="text-muted">Signup</small>
+                  </h2>
+                  <form action="/signup" method="POST">
+                      <input class="box" type="text" name="username" placeholder="Email or Username">
+                      <input class="box" type="password" name="password" placeholder="Password">
+                      <div id="buttons">
+                          <button type="submit" class="login-btn">Signup</button>
+                          <button class="login-btn" id="google-vaala-button" style="width:250px!important;">
+                              <div class="google-icon-wrapper">
+                                  <img class="google-icon"
+                                      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
+                              </div>
+                              Sign up with Google
+                          </button>
+                          <br><a style="font-size: 0.9em;" href="/login">Already have an account yet? Sign in.</a>
+                      </div>
+                  </form>
+              </div>
+              <div id="login-footer">
+                  <i>Made with <font color="red">♥</font> by <a href="http://ishandeveloper.com">ishandeveloper </a></i>
+              </div>
+          </div>
+      </div>
+
+      <%- include('partials/footer'); -%>
