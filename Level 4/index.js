@@ -2,8 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const saltRounds=10;
-require('dotenv').config();
+const saltRounds = 10;
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -45,22 +44,23 @@ const userSchema = mongoose.Schema({
 
 
 
-
 ///////////////////////MODEL/////////////////////
 const User = mongoose.model('user', userSchema);
 
 app.post('/signup', (req, res) => {
-    const newUser = User({
-        username: req.body.username,
-        password: md5(req.body.password)
-    });
+    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+        const newUser = User({
+            username: req.body.username,
+            password: hash
+        });
 
-    newUser.save((e) => {
-        if (!e) {
-            res.render('secrets.ejs');
-        } else {
-            console.log(e);
-        }
+        newUser.save((e) => {
+            if (!e) {
+                res.render('secrets.ejs');
+            } else {
+                console.log(e);
+            }
+        });
     });
 
 });
@@ -78,10 +78,19 @@ app.post('/login', (req, res) => {
     User.findOne({
         username: user
     }, (e, matchedUser) => {
-        if (matchedUser.password == md5(pass)) {
-            res.render('secrets.ejs');
+        if (!e) {
+            bcrypt.compare(pass,matchedUser.password,(e,result)=>{
+                if(!e){
+                    if(result){
+                        res.render('secrets.ejs');
+                    }
+                    else{
+                        res.redirect('/login');
+                    }
+                }
+            });
         } else {
-            console.log("ERROR");
+            console.log(e);
         }
     });
 
