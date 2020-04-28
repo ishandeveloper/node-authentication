@@ -97,6 +97,22 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
 
+    const newUser=User({
+        username:req.body.username,
+        password:req.body.password
+    });
+
+    req.login(newUser,(e)=>{
+        if(e){
+            console.log(e);
+            res.redirect('/login');
+        }
+        else{
+            passport.authenticate("local")(req,res,()=>{
+                res.redirect('/secrets');
+            });
+        }
+    });
 
 });
 
