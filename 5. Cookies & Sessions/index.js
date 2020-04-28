@@ -19,21 +19,10 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        secure: true
-    }
 }))
 
 app.use(passport.initialize());
 app.use(passport.session());
-////////////////////////////////////ROUTES///////////////////////////////
-app.get('/', (req, res) => {
-    res.render('home.ejs');
-});
-
-app.get('/signup', (req, res) => {
-    res.render('signup.ejs');
-});
 
 ///////////////////////CONNECTING TO DATABASE/////////////////////////////
 
@@ -44,6 +33,14 @@ mongoose.connect("mongodb://localhost:27017/authentication", {
     console.log("CONNECTED TO MONGODB!");
 });
 
+////////////////////////////////////ROUTES///////////////////////////////
+app.get('/', (req, res) => {
+    res.render('home.ejs');
+});
+
+app.get('/signup', (req, res) => {
+    res.render('signup.ejs');
+});
 
 
 ///////////////////////USERS/////////////////////
@@ -66,9 +63,29 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.get('/secrets', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.render('secrets');
+    } else {
+        res.redirect('/login');
+    }
+});
+
 app.post('/signup', (req, res) => {
 
 
+    User.register({
+        username: req.body.username
+    }, req.body.password, (e, user) => {
+        if (e) {
+            console.log(e);
+            res.redirect('/signup');
+        } else {
+            passport.authenticate("local")(req, res, () => {
+                res.redirect('/secrets');
+            })
+        }
+    });
 
 });
 
