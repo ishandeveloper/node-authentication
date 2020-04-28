@@ -100,6 +100,13 @@ app.post('/login', (req, res) => {
 
 });
 
+///////////////////////////////LOGOUT USERS////////////////////////////////////////
+
+app.get('/logout',(req,res)=>{
+    req.logOut();
+    res.redirect('/');
+});
+
 app.listen(port, () => {
     console.log("Server up at " + port);
 })
